@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Warcraft 2D Mobile</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Игровой контейнер -->
+    <div id="gameContainer">
+        <!-- Основной игровой холст -->
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Мобильный интерфейс -->
+        <div id="mobileUI">
+            <!-- Информационная панель -->
+            <div id="infoPanel">
+                <div id="resources">
+                    <span id="gold">🪙 1000</span>
+                    <span id="wood">🌲 500</span>
+                    <span id="food">🍖 10/50</span>
+                </div>
+                <div id="selectedUnit"></div>
+            </div>
+            
+            <!-- Мини-карта -->
+            <div id="minimap">
+                <canvas id="minimapCanvas"></canvas>
+            </div>
+            
+            <!-- Панель команд -->
+            <div id="commandPanel">
+                <div id="buildingButtons" class="button-grid">
+                    <button class="build-btn" data-building="townhall">🏰</button>
+                    <button class="build-btn" data-building="barracks">⚔️</button>
+                    <button class="build-btn" data-building="farm">🌾</button>
+                    <button class="build-btn" data-building="lumber">🪓</button>
+                </div>
+                
+                <div id="unitButtons" class="button-grid">
+                    <button class="unit-btn" data-unit="peasant">👨‍🌾</button>
+                    <button class="unit-btn" data-unit="footman">🛡️</button>
+                    <button class="unit-btn" data-unit="archer">🏹</button>
+                    <button class="unit-btn" data-unit="knight">🐎</button>
+                </div>
+            </div>
+            
+            <!-- Виртуальный джойстик -->
+            <div id="joystick">
+                <div id="joystickHandle"></div>
+            </div>
+            
+            <!-- Кнопки действий -->
+            <div id="actionButtons">
+                <button id="attackBtn">⚔️</button>
+                <button id="stopBtn">✋</button>
+                <button id="moveBtn">📍</button>
+            </div>
+        </div>
+        
+        <!-- Загрузочный экран -->
+        <div id="loadingScreen">
+            <div class="loading-content">
+                <h1>Warcraft 2D</h1>
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+                <p>Загрузка...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Меню паузы -->
+    <div id="pauseMenu" class="hidden">
+        <div class="menu-content">
+            <h2>Пауза</h2>
+            <button id="resumeBtn">Продолжить</button>
+            <button id="settingsBtn">Настройки</button>
+            <button id="exitBtn">Выход</button>
+        </div>
+    </div>
+    
+    <!-- Модуль игры -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
