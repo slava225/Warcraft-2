@@ -67,11 +67,52 @@
         <!-- Загрузочный экран -->
         <div id="loadingScreen">
             <div class="loading-content">
-                <h1>Warcraft 2D</h1>
-                <div class="loading-bar">
-                    <div class="loading-progress"></div>
+                <!-- Анимированная иконка игры -->
+                <div class="game-logo">
+                    <div class="castle-icon">
+                        <div class="castle-base"></div>
+                        <div class="castle-tower left"></div>
+                        <div class="castle-tower center"></div>
+                        <div class="castle-tower right"></div>
+                        <div class="castle-flag"></div>
+                    </div>
                 </div>
-                <p>Загрузка...</p>
+                
+                <h1>Warcraft 2D</h1>
+                <p class="subtitle">Эпические сражения ждут!</p>
+                
+                <!-- Прогресс бар -->
+                <div class="loading-container">
+                    <div class="loading-bar">
+                        <div class="loading-progress"></div>
+                        <div class="loading-glow"></div>
+                    </div>
+                    <div class="loading-percentage">0%</div>
+                </div>
+                
+                <!-- Статус загрузки -->
+                <p class="loading-status">Инициализация игры...</p>
+                
+                <!-- Анимированные точки -->
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <!-- Подсказки -->
+                <div class="loading-tips">
+                    <p class="tip">Совет: Используйте джойстик для управления камерой</p>
+                </div>
+            </div>
+            
+            <!-- Фоновые частицы -->
+            <div class="background-particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
             </div>
         </div>
     </div>
