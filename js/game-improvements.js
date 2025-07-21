@@ -89,23 +89,26 @@ export class GameImprovements {
             forests: [],
             
             init: () => {
-                // Создаем золотые шахты
-                for (let i = 0; i < 5; i++) {
-                    this.game.gathering.goldMines.push({
-                        x: Math.random() * this.game.worldMap.width * 32,
-                        y: Math.random() * this.game.worldMap.height * 32,
-                        resources: 1000
-                    });
-                }
+                // Создаем золотые шахты в фиксированных местах
+                this.game.gathering.goldMines = [
+                    { x: 200, y: 200, resources: 1500, width: 64, height: 64, type: 'gold' },
+                    { x: 1000, y: 300, resources: 1500, width: 64, height: 64, type: 'gold' },
+                    { x: 600, y: 600, resources: 1500, width: 64, height: 64, type: 'gold' }
+                ];
                 
-                // Создаем леса
-                for (let i = 0; i < 10; i++) {
-                    this.game.gathering.forests.push({
-                        x: Math.random() * this.game.worldMap.width * 32,
-                        y: Math.random() * this.game.worldMap.height * 32,
-                        resources: 500
-                    });
-                }
+                // Создаем леса в фиксированных местах
+                this.game.gathering.forests = [
+                    { x: 300, y: 150, resources: 800, width: 32, height: 32, type: 'wood' },
+                    { x: 350, y: 150, resources: 800, width: 32, height: 32, type: 'wood' },
+                    { x: 300, y: 200, resources: 800, width: 32, height: 32, type: 'wood' },
+                    { x: 350, y: 200, resources: 800, width: 32, height: 32, type: 'wood' },
+                    { x: 800, y: 400, resources: 800, width: 32, height: 32, type: 'wood' },
+                    { x: 850, y: 400, resources: 800, width: 32, height: 32, type: 'wood' },
+                    { x: 800, y: 450, resources: 800, width: 32, height: 32, type: 'wood' },
+                    { x: 850, y: 450, resources: 800, width: 32, height: 32, type: 'wood' }
+                ];
+                
+                console.log('Созданы ресурсы:', this.game.gathering.goldMines.length, 'рудников,', this.game.gathering.forests.length, 'деревьев');
             },
             
             gatherGold: (peasant, mine) => {
@@ -335,26 +338,68 @@ export class GameImprovements {
 
     renderResources(ctx) {
         // Рендерим золотые шахты
-        ctx.fillStyle = '#ffd700';
         for (const mine of this.game.gathering.goldMines) {
             if (mine.resources > 0) {
-                ctx.fillRect(mine.x, mine.y, 32, 32);
-                ctx.fillStyle = '#000';
+                // Основа рудника
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(mine.x, mine.y, mine.width, mine.height);
+                
+                // Золотые вкрапления
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(mine.x + 5, mine.y + 5, 15, 15);
+                ctx.fillRect(mine.x + 25, mine.y + 15, 12, 12);
+                ctx.fillRect(mine.x + 10, mine.y + 35, 18, 10);
+                
+                // Границы
+                ctx.strokeStyle = '#654321';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(mine.x, mine.y, mine.width, mine.height);
+                
+                // Количество ресурсов
+                ctx.fillStyle = '#FFFFFF';
                 ctx.font = '12px Arial';
-                ctx.fillText(mine.resources.toString(), mine.x + 5, mine.y + 20);
-                ctx.fillStyle = '#ffd700';
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 1;
+                ctx.strokeText(mine.resources.toString(), mine.x + 5, mine.y + 55);
+                ctx.fillText(mine.resources.toString(), mine.x + 5, mine.y + 55);
             }
         }
         
-        // Рендерим леса
-        ctx.fillStyle = '#228b22';
-        for (const forest of this.game.gathering.forests) {
-            if (forest.resources > 0) {
-                ctx.fillRect(forest.x, forest.y, 32, 32);
-                ctx.fillStyle = '#000';
-                ctx.font = '12px Arial';
-                ctx.fillText(forest.resources.toString(), forest.x + 5, forest.y + 20);
-                ctx.fillStyle = '#228b22';
+        // Рендерим деревья
+        for (const tree of this.game.gathering.forests) {
+            if (tree.resources > 0) {
+                // Ствол дерева
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(tree.x + 12, tree.y + 20, 8, 12);
+                
+                // Крона дерева
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath();
+                ctx.arc(tree.x + 16, tree.y + 16, 12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Тень кроны
+                ctx.fillStyle = '#006400';
+                ctx.beginPath();
+                ctx.arc(tree.x + 18, tree.y + 18, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Границы
+                ctx.strokeStyle = '#004000';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(tree.x + 16, tree.y + 16, 12, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Количество ресурсов (если нужно показать)
+                if (tree.resources < 600) {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = '10px Arial';
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 1;
+                    ctx.strokeText(tree.resources.toString(), tree.x + 2, tree.y + 12);
+                    ctx.fillText(tree.resources.toString(), tree.x + 2, tree.y + 12);
+                }
             }
         }
     }

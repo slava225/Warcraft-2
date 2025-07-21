@@ -232,13 +232,14 @@ export class Unit {
         }
         
         const distance = Math.hypot(
-            this.gatherTarget.x - this.x,
-            this.gatherTarget.y - this.y
+            this.gatherTarget.x + this.gatherTarget.width/2 - this.x - this.width/2,
+            this.gatherTarget.y + this.gatherTarget.height/2 - this.y - this.height/2
         );
         
-        if (distance <= 40) {
+        if (distance <= 50) {
             // Начинаем добычу
             this.taskData.gatherTimer = (this.taskData.gatherTimer || 0) + deltaTime;
+            this.isMoving = false;
             
             if (this.taskData.gatherTimer >= 2.0) { // 2 секунды на добычу
                 this.harvestResource(this.gatherTarget, entityManager);
@@ -246,20 +247,39 @@ export class Unit {
             }
         } else {
             // Идем к ресурсу
-            this.moveTo(this.gatherTarget.x, this.gatherTarget.y, entityManager);
+            if (!this.isMoving) {
+                this.moveTo(this.gatherTarget.x + this.gatherTarget.width/2, this.gatherTarget.y + this.gatherTarget.height/2, entityManager);
+            }
         }
     }
 
-    updateBuilding(deltaTime, entityManager) {
-        if (!this.buildTarget) {
-            this.task = 'idle';
-            return;
-        }
-        
-        const distance = Math.hypot(
-            this.buildTarget.x + this.buildTarget.width / 2 - this.x - this.width / 2,
-            this.buildTarget.y + this.buildTarget.height / 2 - this.y - this.height / 2
-        );
+         updateBuilding(deltaTime, entityManager) {
+         if (!this.buildTarget) {
+             this.task = 'idle';
+             return;
+         }
+         
+         const distance = Math.hypot(
+             this.buildTarget.x + this.buildTarget.width/2 - this.x - this.width/2,
+             this.buildTarget.y + this.buildTarget.height/2 - this.y - this.height/2
+         );
+         
+         if (distance <= 60) {
+             // Начинаем строительство
+             this.taskData.buildTimer = (this.taskData.buildTimer || 0) + deltaTime;
+             this.isMoving = false;
+             
+             if (this.taskData.buildTimer >= 1.0) { // 1 секунда на постройку
+                 this.constructBuilding(this.buildTarget, entityManager);
+                 this.taskData.buildTimer = 0;
+             }
+         } else {
+             // Идем к зданию
+             if (!this.isMoving) {
+                 this.moveTo(this.buildTarget.x + this.buildTarget.width/2, this.buildTarget.y + this.buildTarget.height/2, entityManager);
+             }
+         }
+     }
         
         if (distance <= 50) {
             // Строим здание
@@ -364,7 +384,7 @@ export class Unit {
     }
 
     gather(resource, entityManager) {
-        if (!this.canGather) return;
+        if (this.type !== 'peasant') return;
         
         this.task = 'gather';
         this.gatherTarget = resource;
@@ -372,11 +392,14 @@ export class Unit {
     }
 
     buildBuilding(building) {
-        if (!this.canBuild) return;
+        if (this.type !== 'peasant') return;
         
         this.task = 'build';
         this.buildTarget = building;
         this.taskData = {};
+        
+        // Идем к зданию
+        this.moveTo(building.x + building.width/2, building.y + building.height/2, null);
     }
 
     stop() {
@@ -578,5 +601,52 @@ export class Unit {
             player: this.player,
             task: this.task
         };
+    }
+
+    // Методы для сбора ресурсов и строительства
+    harvestResource(resource, entityManager) {
+        if (!resource || resource.resources <= 0) {
+            this.task = 'idle';
+            this.gatherTarget = null;
+            return;
+        }
+
+        const amount = Math.min(10, resource.resources);
+        resource.resources -= amount;
+
+        // Добавляем ресурсы игроку
+        if (entityManager.game && entityManager.game.resourceManager) {
+            if (resource.type === 'gold') {
+                entityManager.game.resourceManager.addResource('gold', amount);
+            } else if (resource.type === 'wood') {
+                entityManager.game.resourceManager.addResource('wood', amount);
+            }
+        }
+
+        console.log(`Собрано ${amount} ${resource.type}`);
+
+        // Если ресурс истощен, завершаем сбор
+        if (resource.resources <= 0) {
+            this.task = 'idle';
+            this.gatherTarget = null;
+        }
+    }
+
+    constructBuilding(building, entityManager) {
+        if (!building) {
+            this.task = 'idle';
+            this.buildTarget = null;
+            return;
+        }
+
+        // Увеличиваем HP здания (строим)
+        building.hp = Math.min(building.maxHp, building.hp + 50);
+
+        if (building.hp >= building.maxHp) {
+            building.isConstructing = false;
+            this.task = 'idle';
+            this.buildTarget = null;
+            console.log('Здание достроено:', building.type);
+        }
     }
 }

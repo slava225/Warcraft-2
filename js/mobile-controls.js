@@ -173,6 +173,20 @@ export class MobileControls {
                 this.createEnemy();
             });
         }
+        
+        const gatherBtn = document.getElementById('gatherBtn');
+        if (gatherBtn) {
+            gatherBtn.addEventListener('click', () => {
+                this.setActionMode('gather');
+            });
+        }
+        
+        const buildModeBtn = document.getElementById('buildModeBtn');
+        if (buildModeBtn) {
+            buildModeBtn.addEventListener('click', () => {
+                this.toggleBuildMode();
+            });
+        }
     }
 
     setupTouchEvents() {
@@ -239,7 +253,12 @@ export class MobileControls {
             const x = this.lastTouch.x - rect.left;
             const y = this.lastTouch.y - rect.top;
             
-            this.game.inputManager.simulateClick(x, y);
+            // Если режим сбора ресурсов, симулируем правый клик
+            if (this.actionMode === 'gather') {
+                this.game.inputManager.simulateRightClick(x, y);
+            } else {
+                this.game.inputManager.simulateClick(x, y);
+            }
         }
         
         this.lastTouch = null;
@@ -452,5 +471,13 @@ export class MobileControls {
             this.game.multiplayer.createLobby();
             this.vibrate(100);
         }
+    }
+
+    toggleBuildMode() {
+        const buildButtons = document.getElementById('buildingButtons');
+        if (buildButtons) {
+            buildButtons.style.display = buildButtons.style.display === 'none' ? 'grid' : 'none';
+        }
+        this.vibrate(50);
     }
 }

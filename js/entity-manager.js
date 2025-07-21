@@ -334,6 +334,41 @@ export class EntityManager {
         }
     }
 
+    // Простой поиск пути (прямая линия)
+    findPath(startX, startY, endX, endY, unitSize = 32) {
+        // Для простоты возвращаем прямой путь
+        // В будущем можно добавить A* алгоритм
+        return [
+            { x: startX, y: startY },
+            { x: endX, y: endY }
+        ];
+    }
+
+    // Проверка коллизии с ресурсами
+    getResourceAt(x, y) {
+        // Проверяем в игре, есть ли система сбора ресурсов
+        if (this.game && this.game.gathering) {
+            // Проверяем золотые шахты
+            for (const mine of this.game.gathering.goldMines) {
+                if (x >= mine.x && x <= mine.x + mine.width &&
+                    y >= mine.y && y <= mine.y + mine.height &&
+                    mine.resources > 0) {
+                    return mine;
+                }
+            }
+            
+            // Проверяем деревья
+            for (const tree of this.game.gathering.forests) {
+                if (x >= tree.x && x <= tree.x + tree.width &&
+                    y >= tree.y && y <= tree.y + tree.height &&
+                    tree.resources > 0) {
+                    return tree;
+                }
+            }
+        }
+        return null;
+    }
+
     render(ctx, camera) {
         console.log(`Рендерим ${this.entities.length} сущностей`);
         

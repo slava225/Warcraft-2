@@ -182,14 +182,20 @@ export class Game {
         
         const worldPos = this.camera.screenToWorld(screenX, screenY);
         const targetEntity = this.entityManager.getEntityAt(worldPos.x, worldPos.y);
+        const resource = this.entityManager.getResourceAt(worldPos.x, worldPos.y);
         
         for (const unit of this.selectedUnits) {
-            if (targetEntity && targetEntity.player !== 1) {
+            if (resource && unit.type === 'peasant') {
+                // Сбор ресурсов
+                unit.gather(resource, this.entityManager);
+                console.log('Крестьянин идет собирать', resource.type);
+            } else if (targetEntity && targetEntity.player !== 1) {
                 // Атака
                 unit.attack(targetEntity);
             } else {
                 // Движение
-                unit.moveTo(worldPos.x, worldPos.y);
+                unit.moveTo(worldPos.x, worldPos.y, this.entityManager);
+                console.log('Юнит движется к', worldPos.x, worldPos.y);
             }
         }
     }
@@ -319,6 +325,8 @@ export class Game {
         if (nearestPeasant) {
             nearestPeasant.buildBuilding(building);
         }
+        
+        console.log('Здание построено:', building.type);
     }
 
     findNearestPeasant(x, y) {

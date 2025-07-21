@@ -426,4 +426,25 @@ export class InputManager {
             isMobile: this.isMobile
         };
     }
+
+    // Методы симуляции для мобильного интерфейса
+    simulateClick(x, y) {
+        this.emit('click', {
+            x: x,
+            y: y,
+            button: 0,
+            ctrlKey: false,
+            originalEvent: { clientX: x, clientY: y }
+        });
+    }
+
+    simulateRightClick(x, y) {
+        this.emit('rightclick', {
+            x: x,
+            y: y,
+            button: 2,
+            ctrlKey: false,
+            originalEvent: { clientX: x, clientY: y }
+        });
+    }
 }
