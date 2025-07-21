@@ -1,7 +1,6 @@
 // Основной модуль игры Warcraft 2D
 import { Game } from './game.js';
 import { MobileControls } from './mobile-controls.js';
-import { AssetLoader } from './asset-loader.js';
 
 class WarcraftApp {
     constructor() {
@@ -93,19 +92,13 @@ class WarcraftApp {
     }
 
     async loadAssets() {
-        const assetLoader = new AssetLoader();
-        
         // Генерируем спрайты в случае отсутствия файлов
         console.log('Генерируем игровые спрайты...');
-        assetLoader.generateGameAssets();
         this.updateLoadingProgress(80);
         
         // Больше не загружаем внешние файлы - используем генераторы
         console.log('Все ресурсы сгенерированы локально');
         this.updateLoadingProgress(100);
-        
-        // Сохраняем ссылку на загрузчик для использования в игре
-        this.assetLoader = assetLoader;
     }
 
     initGame() {
@@ -114,8 +107,7 @@ class WarcraftApp {
             ctx: this.ctx,
             width: this.canvas.width,
             height: this.canvas.height,
-            isMobile: this.isMobileDevice(),
-            assetLoader: this.assetLoader
+            isMobile: this.isMobileDevice()
         };
 
         this.game = new Game(gameConfig);
