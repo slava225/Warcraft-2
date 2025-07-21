@@ -1,7 +1,11 @@
 // Улучшения для игры Warcraft 2D
+import { SoundGenerator } from './sound-generator.js';
+
 export class GameImprovements {
-    constructor(game) {
+    constructor(game, Unit, Building) {
         this.game = game;
+        this.Unit = Unit;
+        this.Building = Building;
         this.setupImprovements();
     }
 
@@ -136,32 +140,22 @@ export class GameImprovements {
 
     // Звуковые эффекты
     addSoundEffects() {
-        this.game.audio = {
-            sounds: new Map(),
+        // Используем встроенный аудио менеджер игры
+        if (this.game.audioManager && this.game.audioManager.audioContext) {
+            this.soundGenerator = new SoundGenerator(this.game.audioManager.audioContext);
+            this.soundGenerator.generateGameSounds();
             
-            load: async (name, url) => {
-                try {
-                    const audio = new Audio(url);
-                    this.game.audio.sounds.set(name, audio);
-                } catch (error) {
-                    console.warn(`Не удалось загрузить звук: ${name}`);
+            this.game.audio = {
+                play: (name, volume = 0.5) => {
+                    this.soundGenerator.playSound(name);
                 }
-            },
-            
-            play: (name, volume = 0.5) => {
-                const sound = this.game.audio.sounds.get(name);
-                if (sound) {
-                    sound.volume = volume;
-                    sound.currentTime = 0;
-                    sound.play().catch(() => {});
-                }
-            }
-        };
-        
-        // Загружаем базовые звуки (создаем тишину если файлы отсутствуют)
-        ['attack', 'build', 'select', 'move', 'gather'].forEach(name => {
-            this.game.audio.sounds.set(name, new Audio());
-        });
+            };
+        } else {
+            // Заглушка если аудио недоступно
+            this.game.audio = {
+                play: () => {}
+            };
+        }
     }
 
     // Система частиц
@@ -232,7 +226,7 @@ export class GameImprovements {
             // Создаем вражеского игрока (AI)
             spawnEnemyPlayer: () => {
                 // Создаем вражескую базу
-                const enemyTownHall = new this.game.entityManager.Building({
+                const enemyTownHall = new this.Building({
                     type: 'townhall',
                     x: this.game.worldMap.width * 32 - 150,
                     y: 100,
@@ -246,7 +240,7 @@ export class GameImprovements {
                 
                 // Создаем вражеских юнитов
                 for (let i = 0; i < 3; i++) {
-                    const enemyUnit = new this.game.entityManager.Unit({
+                    const enemyUnit = new this.Unit({
                         type: 'footman',
                         x: this.game.worldMap.width * 32 - 200 + (i * 30),
                         y: 150,

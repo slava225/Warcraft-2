@@ -34,6 +34,14 @@ export class EntityManager {
         return this.entities.filter(entity => entity.player === player);
     }
 
+    getPlayerUnits(player) {
+        return this.entities.filter(entity => entity.player === player && !entity.isBuilding);
+    }
+
+    getPlayerBuildings(player) {
+        return this.entities.filter(entity => entity.player === player && entity.isBuilding);
+    }
+
     getEntityAt(x, y) {
         // Сначала проверяем в пространственной сетке
         const gridKey = this.getGridKey(x, y);

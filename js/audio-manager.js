@@ -16,6 +16,19 @@ export class AudioManager {
     initializeAudioContext() {
         try {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Если AudioContext приостановлен, попробуем его возобновить
+            if (this.audioContext.state === 'suspended') {
+                // Будем ждать пользовательского действия
+                document.addEventListener('click', () => {
+                    this.audioContext.resume();
+                }, { once: true });
+                
+                document.addEventListener('touchstart', () => {
+                    this.audioContext.resume();
+                }, { once: true });
+            }
+            
         } catch (error) {
             console.warn('Аудио контекст не поддерживается:', error);
             this.enabled = false;

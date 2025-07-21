@@ -48,7 +48,7 @@ export class Game {
         this.camera.moveTo(400, 300);
         
         // Добавляем улучшения
-        this.improvements = new GameImprovements(this);
+        this.improvements = new GameImprovements(this, Unit, Building);
     }
 
     init() {

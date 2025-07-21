@@ -98,26 +98,11 @@ class WarcraftApp {
         // Генерируем спрайты в случае отсутствия файлов
         console.log('Генерируем игровые спрайты...');
         assetLoader.generateGameAssets();
-        this.updateLoadingProgress(50);
+        this.updateLoadingProgress(80);
         
-        // Список дополнительных ресурсов для загрузки
-        const optionalAssets = [
-            'sprites/ui.png',
-            'audio/music.mp3',
-            'audio/sounds.mp3'
-        ];
-
-        let loaded = 0;
-        
-        for (const asset of optionalAssets) {
-            try {
-                await assetLoader.load(asset);
-                loaded++;
-            } catch (error) {
-                console.warn(`Не удалось загрузить дополнительный ресурс: ${asset}`);
-            }
-            this.updateLoadingProgress(50 + (loaded / optionalAssets.length) * 50);
-        }
+        // Больше не загружаем внешние файлы - используем генераторы
+        console.log('Все ресурсы сгенерированы локально');
+        this.updateLoadingProgress(100);
         
         // Сохраняем ссылку на загрузчик для использования в игре
         this.assetLoader = assetLoader;
