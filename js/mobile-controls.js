@@ -166,6 +166,13 @@ export class MobileControls {
                 this.setActionMode('move');
             });
         }
+        
+        const enemyBtn = document.getElementById('enemyBtn');
+        if (enemyBtn) {
+            enemyBtn.addEventListener('click', () => {
+                this.createEnemy();
+            });
+        }
     }
 
     setupTouchEvents() {
@@ -438,5 +445,12 @@ export class MobileControls {
             const unitType = button.dataset.unit;
             button.disabled = !this.game.selectedBuilding;
         });
+    }
+
+    createEnemy() {
+        if (this.game.multiplayer && this.game.multiplayer.createLobby) {
+            this.game.multiplayer.createLobby();
+            this.vibrate(100);
+        }
     }
 }

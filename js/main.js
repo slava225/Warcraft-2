@@ -97,11 +97,13 @@ class WarcraftApp {
     async loadAssets() {
         const assetLoader = new AssetLoader();
         
-        // Список ресурсов для загрузки
-        const assets = [
-            'sprites/units.png',
-            'sprites/buildings.png',
-            'sprites/terrain.png',
+        // Генерируем спрайты в случае отсутствия файлов
+        console.log('Генерируем игровые спрайты...');
+        assetLoader.generateGameAssets();
+        this.updateLoadingProgress(50);
+        
+        // Список дополнительных ресурсов для загрузки
+        const optionalAssets = [
             'sprites/ui.png',
             'audio/music.mp3',
             'audio/sounds.mp3'
@@ -109,15 +111,18 @@ class WarcraftApp {
 
         let loaded = 0;
         
-        for (const asset of assets) {
+        for (const asset of optionalAssets) {
             try {
                 await assetLoader.load(asset);
                 loaded++;
-                this.updateLoadingProgress((loaded / assets.length) * 100);
             } catch (error) {
-                console.warn(`Не удалось загрузить ресурс: ${asset}`);
+                console.warn(`Не удалось загрузить дополнительный ресурс: ${asset}`);
             }
+            this.updateLoadingProgress(50 + (loaded / optionalAssets.length) * 50);
         }
+        
+        // Сохраняем ссылку на загрузчик для использования в игре
+        this.assetLoader = assetLoader;
     }
 
     initGame() {
@@ -126,7 +131,8 @@ class WarcraftApp {
             ctx: this.ctx,
             width: this.canvas.width,
             height: this.canvas.height,
-            isMobile: this.isMobileDevice()
+            isMobile: this.isMobileDevice(),
+            assetLoader: this.assetLoader
         };
 
         this.game = new Game(gameConfig);

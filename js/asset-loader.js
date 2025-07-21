@@ -1,9 +1,12 @@
 // Загрузчик ресурсов для игры
+import { SpriteGenerator } from './sprite-generator.js';
+
 export class AssetLoader {
     constructor() {
         this.assets = new Map();
         this.loadedAssets = new Map();
         this.loadingPromises = new Map();
+        this.spriteGenerator = new SpriteGenerator();
     }
 
     async load(path) {
@@ -53,7 +56,7 @@ export class AssetLoader {
             this.loadingPromises.delete(path);
             console.warn(`Не удалось загрузить ресурс: ${path}`, error);
             // Возвращаем заглушку в зависимости от типа
-            return this.createFallback(extension);
+            return this.createFallback(extension, path);
         }
     }
 
@@ -91,14 +94,14 @@ export class AssetLoader {
         return response.text();
     }
 
-    createFallback(extension) {
+    createFallback(extension, path = '') {
         switch (extension) {
             case 'png':
             case 'jpg':
             case 'jpeg':
             case 'gif':
             case 'webp':
-                return this.createPlaceholderImage();
+                return this.createPlaceholderImage(path);
             case 'mp3':
             case 'wav':
             case 'ogg':
@@ -110,7 +113,26 @@ export class AssetLoader {
         }
     }
 
-    createPlaceholderImage() {
+    createPlaceholderImage(path = '') {
+        // Пытаемся определить тип спрайта по пути
+        if (path.includes('units')) {
+            const unitType = this.extractTypeFromPath(path, ['peasant', 'footman', 'archer', 'knight']);
+            if (unitType) {
+                return this.spriteGenerator.getSprite('unit', unitType, 32, 32);
+            }
+        } else if (path.includes('buildings')) {
+            const buildingType = this.extractTypeFromPath(path, ['townhall', 'barracks', 'farm', 'lumber']);
+            if (buildingType) {
+                return this.spriteGenerator.getSprite('building', buildingType, 64, 64);
+            }
+        } else if (path.includes('terrain')) {
+            const terrainType = this.extractTypeFromPath(path, ['grass', 'dirt', 'water', 'mountain', 'forest']);
+            if (terrainType) {
+                return this.spriteGenerator.getSprite('terrain', terrainType, 32, 32);
+            }
+        }
+        
+        // Дефолтная заглушка
         const canvas = document.createElement('canvas');
         canvas.width = 64;
         canvas.height = 64;
@@ -125,6 +147,15 @@ export class AssetLoader {
         }
         
         return canvas;
+    }
+
+    extractTypeFromPath(path, types) {
+        for (const type of types) {
+            if (path.toLowerCase().includes(type)) {
+                return type;
+            }
+        }
+        return null;
     }
 
     createSilentAudio() {
@@ -149,5 +180,30 @@ export class AssetLoader {
     clear() {
         this.loadedAssets.clear();
         this.loadingPromises.clear();
+    }
+
+    // Создает все необходимые спрайты для игры
+    generateGameAssets() {
+        const sprites = this.spriteGenerator.generateGameSprites();
+        
+        // Сохраняем спрайты в кеш под ожидаемыми путями
+        this.loadedAssets.set('sprites/units.png', sprites.units);
+        this.loadedAssets.set('sprites/buildings.png', sprites.buildings);
+        this.loadedAssets.set('sprites/terrain.png', sprites.terrain);
+        
+        // Также сохраняем отдельные спрайты
+        Object.keys(sprites.units).forEach(type => {
+            this.loadedAssets.set(`sprites/units/${type}.png`, sprites.units[type]);
+        });
+        
+        Object.keys(sprites.buildings).forEach(type => {
+            this.loadedAssets.set(`sprites/buildings/${type}.png`, sprites.buildings[type]);
+        });
+        
+        Object.keys(sprites.terrain).forEach(type => {
+            this.loadedAssets.set(`sprites/terrain/${type}.png`, sprites.terrain[type]);
+        });
+        
+        return sprites;
     }
 }

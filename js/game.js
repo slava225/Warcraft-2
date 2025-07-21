@@ -8,6 +8,7 @@ import { UI } from './ui.js';
 import { AudioManager } from './audio-manager.js';
 import { Unit } from './entities/unit.js';
 import { Building } from './entities/building.js';
+import { GameImprovements } from './game-improvements.js';
 
 export class Game {
     constructor(config) {
@@ -16,6 +17,7 @@ export class Game {
         this.width = config.width;
         this.height = config.height;
         this.isMobile = config.isMobile;
+        this.assetLoader = config.assetLoader;
         
         // Игровое состояние
         this.isPaused = false;
@@ -41,6 +43,9 @@ export class Game {
         
         // Инициализация
         this.init();
+        
+        // Добавляем улучшения
+        this.improvements = new GameImprovements(this);
     }
 
     init() {
@@ -378,6 +383,11 @@ export class Game {
         this.camera.fullUpdate(this.deltaTime);
         this.ui.update(this.deltaTime);
         
+        // Обновляем улучшения
+        if (this.improvements) {
+            this.improvements.update(this.deltaTime);
+        }
+        
         // Обновляем призрак здания
         if (this.buildingGhost) {
             const mousePos = this.inputManager.getMousePosition();
@@ -436,6 +446,11 @@ export class Game {
         
         // Рендерим выделение
         this.renderSelection(ctx);
+        
+        // Рендерим улучшения
+        if (this.improvements) {
+            this.improvements.render(ctx);
+        }
         
         ctx.restore();
         
