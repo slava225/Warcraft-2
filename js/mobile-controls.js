@@ -303,6 +303,8 @@ export class MobileControls {
     }
 
     handleBuildCommand(buildingType) {
+        console.log('Команда строительства:', buildingType);
+        
         if (this.game.buildMode === buildingType) {
             this.game.exitBuildMode();
         } else {
@@ -310,6 +312,7 @@ export class MobileControls {
         }
         
         this.updateBuildButtons();
+        this.vibrate(100);
     }
 
     handleUnitCommand(unitType) {

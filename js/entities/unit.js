@@ -141,57 +141,36 @@ export class Unit {
     }
 
     updateMovement(deltaTime, entityManager) {
-        if (!this.isMoving && this.path.length === 0) return;
+        if (!this.isMoving) return;
         
-        // Следуем по пути
-        if (this.path.length > 0) {
-            const currentTarget = this.path[this.pathIndex];
+        // Упрощенное движение - движемся прямо к цели
+        if (this.targetX !== undefined && this.targetY !== undefined) {
             const distanceToTarget = Math.hypot(
-                currentTarget.x - this.x - this.width / 2,
-                currentTarget.y - this.y - this.height / 2
+                this.targetX - (this.x + this.width / 2),
+                this.targetY - (this.y + this.height / 2)
             );
             
-            if (distanceToTarget < 5) {
-                // Достигли текущей точки пути
-                this.pathIndex++;
-                if (this.pathIndex >= this.path.length) {
-                    // Достигли конца пути
-                    this.path = [];
-                    this.pathIndex = 0;
-                    this.isMoving = false;
-                    this.velocity = { x: 0, y: 0 };
-                    return;
-                }
-            } else {
-                // Двигаемся к текущей точке пути
-                const angle = Math.atan2(
-                    currentTarget.y - this.y - this.height / 2,
-                    currentTarget.x - this.x - this.width / 2
-                );
-                
-                this.velocity.x = Math.cos(angle) * this.speed;
-                this.velocity.y = Math.sin(angle) * this.speed;
+            if (distanceToTarget < 10) {
+                // Достигли цели
+                this.isMoving = false;
+                this.velocity = { x: 0, y: 0 };
+                console.log(`${this.type} достиг цели`);
+                return;
             }
-        }
-        
-        // Применяем скорость
-        if (this.velocity.x !== 0 || this.velocity.y !== 0) {
-            const oldX = this.x;
-            const oldY = this.y;
             
+            // Двигаемся к цели
+            const angle = Math.atan2(
+                this.targetY - (this.y + this.height / 2),
+                this.targetX - (this.x + this.width / 2)
+            );
+            
+            this.velocity.x = Math.cos(angle) * this.speed;
+            this.velocity.y = Math.sin(angle) * this.speed;
+            
+            // Применяем движение
             this.x += this.velocity.x * deltaTime;
             this.y += this.velocity.y * deltaTime;
-            
-            // Проверяем коллизии
-            const collisions = entityManager.checkCollisions(this);
-            if (collisions.length > 0) {
-                // Возвращаемся на предыдущую позицию и пытаемся обойти препятствие
-                this.x = oldX;
-                this.y = oldY;
-                this.handleCollision(collisions[0], entityManager);
-            } else {
-                this.hasMoved = true;
-            }
+            this.hasMoved = true;
         }
     }
 
@@ -353,16 +332,12 @@ export class Unit {
         this.task = 'move';
         this.target = null;
         
-        // Находим путь к цели
-        this.path = entityManager.findPath(
-            this.x + this.width / 2,
-            this.y + this.height / 2,
-            x, y,
-            Math.max(this.width, this.height)
-        );
-        
-        this.pathIndex = 0;
+        // Устанавливаем цель движения
+        this.targetX = x;
+        this.targetY = y;
         this.isMoving = true;
+        
+        console.log(`${this.type} получил команду движения к ${x}, ${y}`);
     }
 
     attack(target) {

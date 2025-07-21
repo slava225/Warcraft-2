@@ -156,8 +156,11 @@ export class Game {
         const worldPos = this.camera.screenToWorld(screenX, screenY);
         const entity = this.entityManager.getEntityAt(worldPos.x, worldPos.y);
         
+        console.log('Клик в мире:', worldPos.x, worldPos.y);
+        
         if (this.buildMode) {
             // Размещение здания
+            console.log('Режим строительства:', this.buildMode);
             this.placeBuildingAt(worldPos.x, worldPos.y);
             return;
         }
@@ -167,10 +170,13 @@ export class Game {
         }
         
         if (entity) {
-            if (entity instanceof Unit && entity.player === 1) {
-                this.selectUnit(entity);
-            } else if (entity instanceof Building && entity.player === 1) {
-                this.selectBuilding(entity);
+            console.log('Выделена сущность:', entity.type, entity.player);
+            if (entity.player === 1) {
+                if (entity.isBuilding) {
+                    this.selectBuilding(entity);
+                } else {
+                    this.selectUnit(entity);
+                }
             }
         }
         
@@ -178,11 +184,16 @@ export class Game {
     }
 
     handleRightClick(screenX, screenY) {
+        console.log('Правый клик, выделено юнитов:', this.selectedUnits.size);
         if (this.selectedUnits.size === 0) return;
         
         const worldPos = this.camera.screenToWorld(screenX, screenY);
         const targetEntity = this.entityManager.getEntityAt(worldPos.x, worldPos.y);
         const resource = this.entityManager.getResourceAt(worldPos.x, worldPos.y);
+        
+        console.log('Правый клик в мире:', worldPos.x, worldPos.y);
+        console.log('Найден ресурс:', resource ? resource.type : 'нет');
+        console.log('Найдена сущность:', targetEntity ? targetEntity.type : 'нет');
         
         for (const unit of this.selectedUnits) {
             if (resource && unit.type === 'peasant') {
@@ -192,10 +203,11 @@ export class Game {
             } else if (targetEntity && targetEntity.player !== 1) {
                 // Атака
                 unit.attack(targetEntity);
+                console.log('Атака цели');
             } else {
                 // Движение
                 unit.moveTo(worldPos.x, worldPos.y, this.entityManager);
-                console.log('Юнит движется к', worldPos.x, worldPos.y);
+                console.log('Юнит', unit.type, 'движется к', worldPos.x, worldPos.y);
             }
         }
     }
@@ -291,11 +303,20 @@ export class Game {
     }
 
     placeBuildingAt(x, y) {
-        if (!this.buildingGhost || !this.buildingGhost.canPlace) return;
+        if (!this.buildingGhost) return;
+        
+        // Проверяем можно ли разместить здание здесь
+        const buildX = x - this.buildingGhost.width / 2;
+        const buildY = y - this.buildingGhost.height / 2;
+        
+        if (!this.canPlaceBuildingAt(buildX, buildY)) {
+            console.log('Нельзя разместить здание здесь');
+            return;
+        }
         
         const cost = this.buildingGhost.cost;
         if (!this.resourceManager.canAfford(cost)) {
-            this.ui.showMessage('Недостаточно ресурсов');
+            console.log('Недостаточно ресурсов');
             return;
         }
         
@@ -307,8 +328,8 @@ export class Game {
         // Создаем здание
         const building = new Building({
             type: this.buildingGhost.type,
-            x: x - this.buildingGhost.width / 2,
-            y: y - this.buildingGhost.height / 2,
+            x: buildX,
+            y: buildY,
             width: this.buildingGhost.width,
             height: this.buildingGhost.height,
             hp: 1,
@@ -327,6 +348,18 @@ export class Game {
         }
         
         console.log('Здание построено:', building.type);
+    }
+
+    enterBuildMode(buildingType) {
+        this.buildMode = buildingType;
+        this.createBuildingGhost(buildingType);
+        console.log('Вошли в режим строительства:', buildingType);
+    }
+
+    exitBuildMode() {
+        this.buildMode = null;
+        this.buildingGhost = null;
+        console.log('Вышли из режима строительства');
     }
 
     findNearestPeasant(x, y) {
@@ -422,7 +455,7 @@ export class Game {
         
         // Проверяем коллизии с другими зданиями
         for (const entity of this.entityManager.entities) {
-            if (entity instanceof Building) {
+            if (entity.isBuilding) {
                 if (x < entity.x + entity.width &&
                     x + width > entity.x &&
                     y < entity.y + entity.height &&
