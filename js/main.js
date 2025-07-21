@@ -61,15 +61,13 @@ class WarcraftApp {
     }
 
     resizeCanvas() {
-        const dpr = window.devicePixelRatio || 1;
+        // Упрощенная настройка канваса
         const rect = this.canvas.getBoundingClientRect();
         
-        this.canvas.width = rect.width * dpr;
-        this.canvas.height = rect.height * dpr;
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
         
-        this.ctx.scale(dpr, dpr);
-        this.canvas.style.width = rect.width + 'px';
-        this.canvas.style.height = rect.height + 'px';
+        console.log('Canvas размеры:', this.canvas.width, 'x', this.canvas.height);
     }
 
     showLoadingScreen() {

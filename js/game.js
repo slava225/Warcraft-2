@@ -44,6 +44,9 @@ export class Game {
         // Инициализация
         this.init();
         
+        // Устанавливаем камеру на стартовую позицию
+        this.camera.moveTo(400, 300);
+        
         // Добавляем улучшения
         this.improvements = new GameImprovements(this);
     }
@@ -68,6 +71,8 @@ export class Game {
     }
 
     createStartingUnits() {
+        console.log('Создаем стартовые юниты...');
+        
         // Главная база
         const townhall = new Building({
             type: 'townhall',
@@ -80,6 +85,7 @@ export class Game {
             player: 1
         });
         this.entityManager.addEntity(townhall);
+        console.log('Создана ратуша:', townhall);
         
         // Стартовые крестьяне
         for (let i = 0; i < 5; i++) {
@@ -96,6 +102,7 @@ export class Game {
             });
             this.entityManager.addEntity(peasant);
         }
+        console.log('Создано крестьян:', 5);
         
         // Казарма
         const barracks = new Building({
@@ -429,6 +436,10 @@ export class Game {
         // Очищаем канвас
         ctx.clearRect(0, 0, this.width, this.height);
         
+        // Временная проверка - рисуем фон
+        ctx.fillStyle = '#2d5016';
+        ctx.fillRect(0, 0, this.width, this.height);
+        
         // Применяем трансформацию камеры
         ctx.save();
         this.camera.apply(ctx);
@@ -437,7 +448,20 @@ export class Game {
         this.worldMap.render(ctx, this.camera);
         
         // Рендерим сущности
+        const entityCount = this.entityManager.entities.length;
         this.entityManager.render(ctx, this.camera);
+        
+        // Временная отладочная визуализация - показываем что рендеринг работает
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+        ctx.fillRect(50, 50, 100, 50);
+        ctx.fillStyle = 'white';
+        ctx.font = '16px Arial';
+        ctx.fillText(`Сущностей: ${entityCount}`, 60, 80);
+        
+        // Отладочная информация (временно)
+        if (entityCount === 0) {
+            console.warn('Нет сущностей для рендеринга!');
+        }
         
         // Рендерим призрак здания
         if (this.buildingGhost) {

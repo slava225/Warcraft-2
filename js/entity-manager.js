@@ -327,30 +327,11 @@ export class EntityManager {
     }
 
     render(ctx, camera) {
-        // Определяем видимую область
-        const viewLeft = -camera.x;
-        const viewTop = -camera.y;
-        const viewRight = viewLeft + camera.viewport.width / camera.zoom;
-        const viewBottom = viewTop + camera.viewport.height / camera.zoom;
+        console.log(`Рендерим ${this.entities.length} сущностей`);
         
-        // Рендерим только видимые сущности
-        const visibleEntities = this.entities.filter(entity => {
-            return entity.x + entity.width >= viewLeft &&
-                   entity.x <= viewRight &&
-                   entity.y + entity.height >= viewTop &&
-                   entity.y <= viewBottom;
-        });
-        
-        // Сортируем по Y координате для правильного z-order
-        visibleEntities.sort((a, b) => (a.y + a.height) - (b.y + b.height));
-        
-        // Рендерим сущности
-        for (const entity of visibleEntities) {
-            if (entity.render) {
-                entity.render(ctx, camera);
-            } else {
-                this.renderDefaultEntity(ctx, entity);
-            }
+        // Упрощенный рендеринг - рендерим все сущности без фильтрации
+        for (const entity of this.entities) {
+            this.renderDefaultEntity(ctx, entity);
         }
     }
 
