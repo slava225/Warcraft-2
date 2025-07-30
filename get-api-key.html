@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Получение API ключа Yandex Search</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .step-title {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        .step-content {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .step-content ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .step-content li {
+            margin: 8px 0;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 10px 10px 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 600;
+        }
+
+        .link-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+        }
+
+        .warning-box .icon {
+            color: #f39c12;
+            margin-right: 8px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #155724;
+        }
+
+        .success-box .icon {
+            color: #28a745;
+            margin-right: 8px;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #495057;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .api-format {
+            background: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .step-card {
+                padding: 20px;
+            }
+
+            .step-number {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-key"></i> Получение API ключа Yandex</h1>
+            <p>Пошаговое руководство для настройки реального поиска изображений</p>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Регистрация аккаунта Yandex</h2>
+            <div class="step-content">
+                <p>Для начала вам нужен аккаунт Yandex:</p>
+                <ul>
+                    <li>Перейдите на <strong>yandex.ru</strong></li>
+                    <li>Нажмите "Войти" → "Создать аккаунт"</li>
+                    <li>Заполните форму регистрации</li>
+                    <li><strong>Обязательно подтвердите номер телефона!</strong></li>
+                </ul>
+                <a href="https://yandex.ru" target="_blank" class="link-button">
+                    <i class="fas fa-external-link-alt"></i> Перейти на Yandex.ru
+                </a>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Переход в раздел разработчика</h2>
+            <div class="step-content">
+                <p>После входа в аккаунт:</p>
+                <ul>
+                    <li>Перейдите на <strong>yandex.ru/dev/xml/</strong></li>
+                    <li>Войдите под своим аккаунтом</li>
+                    <li>Изучите документацию по XML Search API</li>
+                </ul>
+                <a href="https://yandex.ru/dev/xml/" target="_blank" class="link-button">
+                    <i class="fas fa-code"></i> Yandex Search API
+                </a>
+                
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle icon"></i>
+                    <strong>Важно:</strong> Yandex Search API может требовать модерацию заявок. Процесс получения доступа может занять от нескольких часов до нескольких дней.
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Подача заявки на API</h2>
+            <div class="step-content">
+                <p>Заполните заявку на получение доступа:</p>
+                <ul>
+                    <li><strong>Название проекта:</strong> "Image Search for Timeweb"</li>
+                    <li><strong>Описание:</strong> "Поиск изображений для веб-приложения на хостинге Timeweb"</li>
+                    <li><strong>URL сайта:</strong> ваш домен на Timeweb (например: mysite.timeweb.ru)</li>
+                    <li><strong>Ожидаемое количество запросов:</strong> до 1000 в день</li>
+                    <li><strong>Цель использования:</strong> поиск изображений по текстовым запросам</li>
+                </ul>
+                
+                <div class="api-format">
+                    <strong>Пример заявки:</strong><br>
+                    "Разрабатываю веб-приложение для поиска изображений по текстовым запросам. 
+                    Сайт размещен на хостинге Timeweb. Планирую использовать API для демонстрации 
+                    возможностей поиска изображений. Ожидаемая нагрузка: до 1000 запросов в день."
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Получение ключей</h2>
+            <div class="step-content">
+                <p>После одобрения заявки вы получите:</p>
+                <ul>
+                    <li><strong>user</strong> - ваш логин пользователя API</li>
+                    <li><strong>key</strong> - секретный ключ для авторизации</li>
+                </ul>
+
+                <div class="code-block">
+                    Пример полученных данных:<br>
+                    user: myusername<br>
+                    key: 03.440176954:c876e18b5f2e7d39e97e5c4c8d1a2b3c
+                </div>
+
+                <div class="success-box">
+                    <i class="fas fa-check-circle icon"></i>
+                    <strong>Лимиты API:</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>Бесплатно: до 1000 запросов в день</li>
+                        <li>Платно: от 10000 запросов в день</li>
+                        <li>Максимум 10 запросов в секунду</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">5</div>
+            <h2 class="step-title">Настройка в приложении</h2>
+            <div class="step-content">
+                <p>Форматы ввода API ключа в нашем приложении:</p>
+                
+                <div class="api-format">
+                    <strong>Вариант 1 (рекомендуемый):</strong><br>
+                    <code>user:key</code><br>
+                    Пример: <code>myusername:03.440176954:c876e18b5f2e7d39e97e5c4c8d1a2b3c</code>
+                </div>
+
+                <div class="api-format">
+                    <strong>Вариант 2:</strong><br>
+                    <code>key</code> (только ключ)<br>
+                    Система автоматически использует ключ и как user и как key
+                </div>
+
+                <div class="warning-box">
+                    <i class="fas fa-shield-alt icon"></i>
+                    <strong>Безопасность:</strong> Никогда не публикуйте ваши API ключи в открытом коде или репозиториях!
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">6</div>
+            <h2 class="step-title">Тестирование API</h2>
+            <div class="step-content">
+                <p>Проверьте работу вашего API ключа:</p>
+                
+                <div class="test-section">
+                    <h3><i class="fas fa-flask"></i> Быстрый тест API</h3>
+                    <div class="input-group">
+                        <label for="testApiKey">Ваш API ключ:</label>
+                        <input type="password" id="testApiKey" placeholder="user:key или просто key">
+                    </div>
+                    <div class="input-group">
+                        <label for="testQuery">Тестовый запрос:</label>
+                        <input type="text" id="testQuery" value="красивые пейзажи" placeholder="Введите запрос для поиска">
+                    </div>
+                    <button class="btn" onclick="testAPI()">
+                        <i class="fas fa-play"></i> Тестировать API
+                    </button>
+                    <div id="testResult" class="result"></div>
+                </div>
+
+                <a href="Index.html" class="link-button">
+                    <i class="fas fa-arrow-right"></i> Перейти к основному приложению
+                </a>
+                <a href="test.html" class="link-button">
+                    <i class="fas fa-cog"></i> Страница диагностики
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const apiKey = document.getElementById('testApiKey').value.trim();
+            const query = document.getElementById('testQuery').value.trim();
+            const resultDiv = document.getElementById('testResult');
+
+            if (!apiKey || !query) {
+                showResult('Пожалуйста, заполните все поля', 'error');
+                return;
+            }
+
+            showResult('🔍 Тестируем API...', 'success');
+
+            try {
+                const response = await fetch('api.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        apiKey: apiKey,
+                        query: query
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showResult(`❌ Ошибка API: ${data.error}`, 'error');
+                    return;
+                }
+
+                const isRealAPI = data.real_api && !data.demo;
+                const icon = isRealAPI ? '🎯' : '🎭';
+                const status = isRealAPI ? 'Реальный API работает!' : 'Демо режим';
+                
+                showResult(
+                    `${icon} ${status}<br>` +
+                    `Найдено изображений: ${data.total}<br>` +
+                    `${isRealAPI ? '✅ Ваш API ключ работает корректно!' : '⚠️ Проверьте корректность API ключа'}`,
+                    isRealAPI ? 'success' : 'error'
+                );
+
+            } catch (error) {
+                console.error('Test error:', error);
+                showResult(`❌ Ошибка тестирования: ${error.message}`, 'error');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+
+        // Показываем подсказку при загрузке
+        window.addEventListener('load', () => {
+            console.log(`
+🔑 Руководство по получению API ключа Yandex готово!
+
+📋 Основные шаги:
+1. Зарегистрируйтесь на yandex.ru
+2. Перейдите на yandex.ru/dev/xml/
+3. Подайте заявку на API
+4. Получите user и key
+5. Используйте формат: user:key
+
+⚠️ Важно: процесс может занять несколько дней!
+            `);
+        });
+    </script>
+</body>
+</html>
