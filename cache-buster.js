@@ -12,7 +12,7 @@
     }
     
     // Force reload if old version detected
-    const currentVersion = '2.0';
+    const currentVersion = '2.1';
     const storedVersion = localStorage.getItem('gameVersion');
     
     if (storedVersion && storedVersion !== currentVersion) {
