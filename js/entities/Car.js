@@ -67,23 +67,30 @@ export class Car {
         this.driver = null;
     }
 
-    accelerate(delta) {
-        this.currentSpeed = Math.min(this.maxSpeed, this.currentSpeed + this.acceleration * (delta / 1000));
+    accelerate(delta, boost = 1.0) {
+        const accel = this.acceleration * boost;
+        this.currentSpeed = Math.min(this.maxSpeed * boost, this.currentSpeed + accel * (delta / 1000));
     }
 
     brake(delta) {
-        this.currentSpeed = Math.max(-this.maxSpeed / 2, this.currentSpeed - this.acceleration * 1.5 * (delta / 1000));
+        if (this.currentSpeed > 0) {
+            this.currentSpeed = Math.max(0, this.currentSpeed - this.acceleration * 2 * (delta / 1000));
+        } else {
+            this.currentSpeed = Math.max(-this.maxSpeed / 3, this.currentSpeed - this.acceleration * (delta / 1000));
+        }
     }
 
     turnLeft(delta) {
-        if (Math.abs(this.currentSpeed) > 10) {
-            this.sprite.rotation -= this.turnSpeed * (delta / 1000) * (this.currentSpeed / this.maxSpeed);
+        if (Math.abs(this.currentSpeed) > 20) {
+            const turnRate = this.turnSpeed * (Math.min(Math.abs(this.currentSpeed) / this.maxSpeed, 1));
+            this.sprite.rotation -= turnRate * (delta / 1000);
         }
     }
 
     turnRight(delta) {
-        if (Math.abs(this.currentSpeed) > 10) {
-            this.sprite.rotation += this.turnSpeed * (delta / 1000) * (this.currentSpeed / this.maxSpeed);
+        if (Math.abs(this.currentSpeed) > 20) {
+            const turnRate = this.turnSpeed * (Math.min(Math.abs(this.currentSpeed) / this.maxSpeed, 1));
+            this.sprite.rotation += turnRate * (delta / 1000);
         }
     }
 

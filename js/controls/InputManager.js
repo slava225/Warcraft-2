@@ -110,11 +110,7 @@ export class InputManager {
         
         // Handle pause
         if (this.mobileInput.pause) {
-            if (this.scene.scene.isPaused()) {
-                this.scene.scene.resume();
-            } else {
-                this.scene.scene.pause();
-            }
+            this.scene.togglePause();
             this.mobileInput.pause = false;
         }
         

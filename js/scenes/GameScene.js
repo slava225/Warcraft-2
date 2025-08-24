@@ -12,6 +12,8 @@ export class GameScene extends Phaser.Scene {
         this.npcs = [];
         this.bullets = [];
         this.buildings = [];
+        this.isPaused = false;
+        this.pauseText = null;
     }
 
     create() {
@@ -324,10 +326,43 @@ export class GameScene extends Phaser.Scene {
         }
     }
 
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        
+        if (this.isPaused) {
+            this.physics.pause();
+            
+            if (!this.pauseText) {
+                const centerX = this.cameras.main.width / 2;
+                const centerY = this.cameras.main.height / 2;
+                
+                this.pauseText = this.add.text(centerX, centerY, 'PAUSED', {
+                    fontSize: '64px',
+                    fill: '#ffffff',
+                    fontFamily: 'Arial',
+                    stroke: '#000000',
+                    strokeThickness: 4
+                })
+                .setOrigin(0.5)
+                .setScrollFactor(0)
+                .setDepth(2000);
+            }
+            this.pauseText.setVisible(true);
+        } else {
+            this.physics.resume();
+            if (this.pauseText) {
+                this.pauseText.setVisible(false);
+            }
+        }
+    }
+
     gameOver() {
         this.scene.pause();
         
-        const gameOverText = this.add.text(640, 360, 'WASTED', {
+        const centerX = this.cameras.main.width / 2;
+        const centerY = this.cameras.main.height / 2;
+        
+        const gameOverText = this.add.text(centerX, centerY, 'WASTED', {
             fontSize: '72px',
             fill: '#ff0000',
             fontFamily: 'Arial',
@@ -338,7 +373,7 @@ export class GameScene extends Phaser.Scene {
         .setScrollFactor(0)
         .setDepth(2000);
         
-        const restartText = this.add.text(640, 440, 'Click to Restart', {
+        const restartText = this.add.text(centerX, centerY + 80, 'Click to Restart', {
             fontSize: '24px',
             fill: '#ffffff',
             fontFamily: 'Arial'
