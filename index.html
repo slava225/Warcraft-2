@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Chaos - GTA 2 Style Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #222;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #gameCanvas {
+            background: #1a1a1a;
+            cursor: crosshair;
+        }
+        
+        .ui-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        
+        .minimap-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+            height: 200px;
+            border: 3px solid #ff6b35;
+            background: rgba(0,0,0,0.8);
+        }
+        
+        #minimapCanvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            padding: 15px 30px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 10px;
+            color: white;
+        }
+        
+        .health-bar {
+            width: 150px;
+        }
+        
+        .bar-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        #healthBar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff3838, #ff6b6b);
+            width: 100%;
+            transition: width 0.3s;
+        }
+        
+        .wanted-stars {
+            display: flex;
+            gap: 5px;
+            font-size: 20px;
+        }
+        
+        .star {
+            color: rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        
+        .star.active {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+        
+        .money-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4ade80;
+        }
+        
+        .pause-menu {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            z-index: 1000;
+        }
+        
+        .pause-menu h2 {
+            font-size: 48px;
+            color: #ff6b35;
+        }
+        
+        .menu-btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .menu-btn:hover {
+            background: #ff8c5a;
+        }
+        
+        .loading-screen {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 2000;
+            color: white;
+        }
+        
+        .loading-screen h1 {
+            font-size: 72px;
+            background: linear-gradient(135deg, #ff6b35, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .loading-bar {
+            width: 400px;
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        #loadingBar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b35, #4ecdc4);
+            width: 0%;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="ui-overlay">
+            <div class="minimap-container">
+                <canvas id="minimapCanvas"></canvas>
+            </div>
+            
+            <div class="status-bar">
+                <div class="health-bar">
+                    <div>Здоровье</div>
+                    <div class="bar-container">
+                        <div id="healthBar"></div>
+                    </div>
+                </div>
+                
+                <div class="wanted-level">
+                    <div>Розыск</div>
+                    <div class="wanted-stars" id="wantedStars">
+                        <span class="star">☆</span>
+                        <span class="star">☆</span>
+                        <span class="star">☆</span>
+                        <span class="star">☆</span>
+                        <span class="star">☆</span>
+                    </div>
+                </div>
+                
+                <div class="money-display">
+                    $<span id="moneyAmount">0</span>
+                </div>
+            </div>
+            
+            <div class="pause-menu" id="pauseMenu" style="display: none;">
+                <h2>ПАУЗА</h2>
+                <button class="menu-btn" onclick="game.resume()">Продолжить</button>
+                <button class="menu-btn" onclick="location.reload()">Начать заново</button>
+                <div>
+                    <h3>Управление:</h3>
+                    <p>WASD / Стрелки - Движение</p>
+                    <p>Shift - Бег</p>
+                    <p>E - Сесть в машину</p>
+                    <p>ESC - Пауза</p>
+                </div>
+            </div>
+            
+            <div class="loading-screen" id="loadingScreen">
+                <h1>URBAN CHAOS</h1>
+                <div class="loading-bar">
+                    <div id="loadingBar"></div>
+                </div>
+                <p>Загрузка города...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
