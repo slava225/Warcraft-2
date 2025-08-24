@@ -1,0 +1,29 @@
+{
+  "name": "city-chaos-gta2-style",
+  "version": "1.0.0",
+  "description": "A GTA 2 style top-down action game built with Phaser 3",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000 || python -m SimpleHTTPServer 8000",
+    "serve": "npx http-server -p 8000"
+  },
+  "keywords": [
+    "game",
+    "phaser3",
+    "gta2",
+    "html5",
+    "javascript",
+    "mobile",
+    "action"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/city-chaos-game.git"
+  },
+  "homepage": "https://yourusername.github.io/city-chaos-game",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

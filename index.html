@@ -2,154 +2,191 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Warcraft 2D Mobile</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
+    <title>City Chaos - GTA 2 Style Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        #game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #game-canvas {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        #mobile-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: none;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .control-button {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            pointer-events: auto;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        .control-button:active {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        #joystick-container {
+            position: absolute;
+            left: 30px;
+            bottom: 30px;
+            width: 150px;
+            height: 150px;
+            pointer-events: auto;
+        }
+        
+        #joystick-base {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+        }
+        
+        #joystick-stick {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            left: 45px;
+            top: 45px;
+            transition: none;
+        }
+        
+        #action-buttons {
+            position: absolute;
+            right: 30px;
+            bottom: 30px;
+            pointer-events: auto;
+        }
+        
+        #enter-car-btn {
+            bottom: 70px;
+            right: 30px;
+        }
+        
+        #shoot-btn {
+            bottom: 0;
+            right: 100px;
+        }
+        
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #loading-text {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        #loading-bar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border: 2px solid #666;
+        }
+        
+        #loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            #mobile-controls {
+                display: block;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Игровой контейнер -->
-    <div id="gameContainer">
-        <!-- Основной игровой холст -->
-        <canvas id="gameCanvas"></canvas>
-        
-        <!-- Мобильный интерфейс -->
-        <div id="mobileUI">
-            <!-- Информационная панель -->
-            <div id="infoPanel">
-                <div id="resources">
-                    <span id="gold">🪙 1000</span>
-                    <span id="wood">🌲 500</span>
-                    <span id="food">🍖 10/50</span>
-                </div>
-                <div id="selectedUnit"></div>
-            </div>
-            
-            <!-- Мини-карта -->
-            <div id="minimap">
-                <canvas id="minimapCanvas"></canvas>
-            </div>
-            
-            <!-- Панель команд -->
-            <div id="commandPanel">
-                <div id="buildingButtons" class="button-grid">
-                    <button class="build-btn" data-building="townhall">🏰</button>
-                    <button class="build-btn" data-building="barracks">⚔️</button>
-                    <button class="build-btn" data-building="farm">🌾</button>
-                    <button class="build-btn" data-building="lumber">🪓</button>
-                </div>
-                
-                <div id="unitButtons" class="button-grid">
-                    <button class="unit-btn" data-unit="peasant">👨‍🌾</button>
-                    <button class="unit-btn" data-unit="footman">🛡️</button>
-                    <button class="unit-btn" data-unit="archer">🏹</button>
-                    <button class="unit-btn" data-unit="knight">🐎</button>
-                </div>
-            </div>
-            
-            <!-- Виртуальный джойстик -->
-            <div id="joystick">
-                <div id="joystickHandle"></div>
-            </div>
-            
-            <!-- Кнопки действий -->
-            <div id="actionButtons">
-                <button id="gatherBtn" title="Собирать ресурсы">⛏️</button>
-                <button id="buildModeBtn" title="Режим строительства">🏗️</button>
-                <button id="attackBtn">⚔️</button>
-                <button id="stopBtn">✋</button>
-                <button id="moveBtn">📍</button>
-                <button id="enemyBtn" title="Создать противника">🤖</button>
-            </div>
+    <div id="loading-screen">
+        <div id="loading-text">Loading City Chaos...</div>
+        <div id="loading-bar">
+            <div id="loading-progress"></div>
         </div>
+    </div>
+    
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
         
-        <!-- Загрузочный экран -->
-        <div id="loadingScreen">
-            <div class="loading-content">
-                <!-- Анимированная иконка игры -->
-                <div class="game-logo">
-                    <div class="castle-icon">
-                        <div class="castle-base"></div>
-                        <div class="castle-tower left"></div>
-                        <div class="castle-tower center"></div>
-                        <div class="castle-tower right"></div>
-                        <div class="castle-flag"></div>
-                    </div>
-                </div>
-                
-                <h1>Warcraft 2D</h1>
-                <p class="subtitle">Эпические сражения ждут!</p>
-                
-                <!-- Прогресс бар -->
-                <div class="loading-container">
-                    <div class="loading-bar">
-                        <div class="loading-progress"></div>
-                        <div class="loading-glow"></div>
-                    </div>
-                    <div class="loading-percentage">0%</div>
-                </div>
-                
-                <!-- Статус загрузки -->
-                <p class="loading-status">Инициализация игры...</p>
-                
-                <!-- Анимированные точки -->
-                <div class="loading-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                
-                <!-- Подсказки -->
-                <div class="loading-tips">
-                    <p class="tip">Совет: Используйте джойстик для управления камерой</p>
-                </div>
+        <div id="mobile-controls">
+            <div id="joystick-container">
+                <div id="joystick-base"></div>
+                <div id="joystick-stick"></div>
             </div>
             
-            <!-- Фоновые частицы -->
-            <div class="background-particles">
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
+            <div id="action-buttons">
+                <div class="control-button" id="enter-car-btn">🚗</div>
+                <div class="control-button" id="shoot-btn">🔫</div>
             </div>
         </div>
     </div>
     
-    <!-- Меню паузы -->
-    <div id="pauseMenu" class="hidden">
-        <div class="menu-content">
-            <h2>Пауза</h2>
-            <button id="resumeBtn">Продолжить</button>
-            <button id="settingsBtn">Настройки</button>
-            <button id="exitBtn">Выход</button>
-        </div>
-    </div>
-    
-    <!-- Модуль игры -->
-    <script type="module" src="js/main.js"></script>
-    
-    <!-- Service Worker для PWA -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Определяем правильный путь для GitHub Pages
-                const swPath = window.location.hostname === 'slava225.github.io' 
-                    ? '/Warcraft-2/service-worker.js'
-                    : './service-worker.js';
-                    
-                navigator.serviceWorker.register(swPath)
-                    .then(registration => {
-                        console.log('Service Worker зарегистрирован:', registration);
-                    })
-                    .catch(error => {
-                        console.log('Ошибка регистрации Service Worker:', error);
-                    });
-            });
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <script type="module" src="js/game.js"></script>
 </body>
 </html>
