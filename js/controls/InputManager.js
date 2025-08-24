@@ -19,7 +19,9 @@ export class InputManager {
             moveX: 0,
             moveY: 0,
             shoot: false,
-            enterCar: false
+            enterCar: false,
+            sprint: false,
+            pause: false
         };
         
         // Check if mobile controls are available
@@ -65,13 +67,17 @@ export class InputManager {
             moveY = this.mobileInput.moveY;
         }
         
+        // Handle sprint/boost
+        const isSprinting = this.shiftKey.isDown || this.mobileInput.sprint;
+        const speedMultiplier = isSprinting ? 1.5 : 1.0;
+        
         // Handle player in car vs on foot
         if (this.player.isInCar && this.player.currentCar) {
             // Car controls
             const car = this.player.currentCar;
             
             if (moveY < 0) {
-                car.accelerate(16);
+                car.accelerate(16 * speedMultiplier);
             } else if (moveY > 0) {
                 car.brake(16);
             }
@@ -89,6 +95,10 @@ export class InputManager {
                 moveY *= 0.707;
             }
             
+            // Apply sprint multiplier
+            moveX *= speedMultiplier;
+            moveY *= speedMultiplier;
+            
             this.player.setVelocity(moveX, moveY);
         }
         
@@ -96,6 +106,16 @@ export class InputManager {
         if (Phaser.Input.Keyboard.JustDown(this.enterKey) || this.mobileInput.enterCar) {
             this.handleEnterExitCar();
             this.mobileInput.enterCar = false;
+        }
+        
+        // Handle pause
+        if (this.mobileInput.pause) {
+            if (this.scene.scene.isPaused()) {
+                this.scene.scene.resume();
+            } else {
+                this.scene.scene.pause();
+            }
+            this.mobileInput.pause = false;
         }
         
         // Handle shooting

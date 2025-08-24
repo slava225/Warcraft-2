@@ -19,7 +19,9 @@
             box-sizing: border-box;
         }
         
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
             background: #000;
             overflow: hidden;
             touch-action: none;
@@ -27,19 +29,28 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
         
         #game-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100vw;
-            height: 100vh;
-            position: relative;
         }
         
-        #game-canvas {
-            display: block;
+        #game-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
@@ -47,9 +58,10 @@
         
         #mobile-controls {
             position: fixed;
-            bottom: 20px;
+            top: 0;
             left: 0;
-            right: 0;
+            width: 100%;
+            height: 100%;
             display: none;
             z-index: 1000;
             pointer-events: none;
@@ -57,70 +69,95 @@
         
         .control-button {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.4);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 32px;
             color: white;
             pointer-events: auto;
             touch-action: none;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s;
         }
         
         .control-button:active {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.8);
         }
         
         #joystick-container {
             position: absolute;
-            left: 30px;
-            bottom: 30px;
-            width: 150px;
-            height: 150px;
+            left: 20px;
+            bottom: 20px;
+            width: 200px;
+            height: 200px;
             pointer-events: auto;
         }
         
         #joystick-base {
             position: absolute;
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 3px solid rgba(255, 255, 255, 0.4);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+            border: 4px solid rgba(255, 255, 255, 0.5);
             border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
         
         #joystick-stick {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.7);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.4));
+            border: 3px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
-            left: 45px;
-            top: 45px;
+            left: 60px;
+            top: 60px;
             transition: none;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
         
         #action-buttons {
             position: absolute;
-            right: 30px;
-            bottom: 30px;
+            right: 20px;
+            bottom: 20px;
             pointer-events: auto;
         }
         
         #enter-car-btn {
-            bottom: 70px;
+            bottom: 120px;
             right: 30px;
         }
         
         #shoot-btn {
-            bottom: 0;
-            right: 100px;
+            bottom: 20px;
+            right: 120px;
+            width: 100px;
+            height: 100px;
+            font-size: 40px;
+        }
+        
+        #sprint-btn {
+            bottom: 20px;
+            right: 30px;
+            font-size: 28px;
+        }
+        
+        #pause-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            pointer-events: auto;
         }
         
         #loading-screen {
@@ -184,14 +221,17 @@
             </div>
             
             <div id="action-buttons">
-                <div class="control-button" id="enter-car-btn">🚗</div>
-                <div class="control-button" id="shoot-btn">🔫</div>
+                <div class="control-button" id="enter-car-btn" title="Enter/Exit Car">🚗</div>
+                <div class="control-button" id="shoot-btn" title="Shoot">🔫</div>
+                <div class="control-button" id="sprint-btn" title="Sprint/Boost">💨</div>
             </div>
+            
+            <div class="control-button" id="pause-btn" title="Pause">⏸️</div>
         </div>
     </div>
     
-    <script src="cache-buster.js?v=2.1"></script>
+    <script src="cache-buster.js?v=3.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
-    <script type="module" src="js/game.js?v=2.1"></script>
+    <script type="module" src="js/game.js?v=3.0"></script>
 </body>
 </html>

@@ -35,7 +35,20 @@ export class GameScene extends Phaser.Scene {
         // Setup camera
         this.cameras.main.setBounds(0, 0, 3200, 3200);
         this.cameras.main.startFollow(this.player.sprite);
-        this.cameras.main.setZoom(1.5);
+        
+        // Dynamic zoom based on screen size
+        const baseZoom = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+        this.cameras.main.setZoom(Math.max(1.0, Math.min(2.0, baseZoom * 1.5)));
+        
+        // Handle resize
+        this.scale.on('resize', (gameSize) => {
+            const width = gameSize.width;
+            const height = gameSize.height;
+            this.cameras.resize(width, height);
+            
+            const newZoom = Math.min(width / 1280, height / 720);
+            this.cameras.main.setZoom(Math.max(1.0, Math.min(2.0, newZoom * 1.5)));
+        });
         
         // Setup input
         this.inputManager = new InputManager(this, this.player);

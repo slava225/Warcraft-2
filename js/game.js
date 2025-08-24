@@ -9,9 +9,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const config = {
         type: Phaser.WEBGL,
         parent: 'game-container',
-        width: 1280,
-        height: 720,
-        backgroundColor: '#2a2a2a',
+        width: window.innerWidth,
+        height: window.innerHeight,
+        backgroundColor: '#1a1a1a',
         physics: {
             default: 'arcade',
             arcade: {
@@ -20,10 +20,10 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         },
         scale: {
-            mode: Phaser.Scale.FIT,
+            mode: Phaser.Scale.RESIZE,
             autoCenter: Phaser.Scale.CENTER_BOTH,
-            width: 1280,
-            height: 720
+            width: '100%',
+            height: '100%'
         },
         audio: {
             disableWebAudio: false,
@@ -32,8 +32,17 @@ window.addEventListener('DOMContentLoaded', () => {
         scene: [PreloadScene, GameScene],
         render: {
             antialias: true,
-            pixelArt: true,
-            roundPixels: true
+            pixelArt: false,
+            roundPixels: false,
+            transparent: false
+        },
+        fps: {
+            target: 60,
+            forceSetTimeOut: false
+        },
+        input: {
+            activePointers: 3,
+            smoothFactor: 0
         }
     };
 

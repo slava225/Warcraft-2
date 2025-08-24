@@ -6,6 +6,8 @@ export class MobileControls {
         this.joystickStick = null;
         this.shootButton = null;
         this.enterCarButton = null;
+        this.sprintButton = null;
+        this.pauseButton = null;
         
         this.isActive = false;
         this.joystickData = {
@@ -37,6 +39,8 @@ export class MobileControls {
         this.joystickStick = document.getElementById('joystick-stick');
         this.shootButton = document.getElementById('shoot-btn');
         this.enterCarButton = document.getElementById('enter-car-btn');
+        this.sprintButton = document.getElementById('sprint-btn');
+        this.pauseButton = document.getElementById('pause-btn');
         
         if (!this.joystickBase || !this.joystickStick) {
             return;
@@ -115,7 +119,7 @@ export class MobileControls {
         const deltaY = clientY - this.joystickData.startY;
         
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const maxDistance = 50; // Maximum joystick movement radius
+        const maxDistance = 70; // Maximum joystick movement radius
         
         let normalizedX = deltaX;
         let normalizedY = deltaY;
@@ -199,6 +203,53 @@ export class MobileControls {
                 }
             });
         }
+        
+        // Sprint button
+        if (this.sprintButton) {
+            const handleSprintStart = (e) => {
+                e.preventDefault();
+                if (this.onInput) {
+                    const currentInput = this.getCurrentInput();
+                    currentInput.sprint = true;
+                    this.onInput(currentInput);
+                }
+            };
+            
+            const handleSprintEnd = (e) => {
+                e.preventDefault();
+                if (this.onInput) {
+                    const currentInput = this.getCurrentInput();
+                    currentInput.sprint = false;
+                    this.onInput(currentInput);
+                }
+            };
+            
+            this.sprintButton.addEventListener('touchstart', handleSprintStart);
+            this.sprintButton.addEventListener('touchend', handleSprintEnd);
+            this.sprintButton.addEventListener('mousedown', handleSprintStart);
+            this.sprintButton.addEventListener('mouseup', handleSprintEnd);
+        }
+        
+        // Pause button
+        if (this.pauseButton) {
+            this.pauseButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (this.onInput) {
+                    const currentInput = this.getCurrentInput();
+                    currentInput.pause = true;
+                    this.onInput(currentInput);
+                }
+            });
+            
+            this.pauseButton.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                if (this.onInput) {
+                    const currentInput = this.getCurrentInput();
+                    currentInput.pause = true;
+                    this.onInput(currentInput);
+                }
+            });
+        }
     }
 
     getCurrentInput() {
@@ -218,7 +269,9 @@ export class MobileControls {
             moveX: moveX,
             moveY: moveY,
             shoot: false,
-            enterCar: false
+            enterCar: false,
+            sprint: false,
+            pause: false
         };
     }
 }
