@@ -117,7 +117,7 @@ def process(
     ru_path.write_text("".join(output_lines), encoding="utf-8")
 
 
-def main() -> None:
+def main() -> int:
     parser = argparse.ArgumentParser(
         description="Translate en_us/client.lang into ru/client.lang with Argos Translate."
     )
@@ -125,24 +125,37 @@ def main() -> None:
     parser.add_argument("--ru", default="ru/client.lang")
     parser.add_argument("--from-code", default="en")
     parser.add_argument("--to-code", default="ru")
+    parser.add_argument(
+        "--no-pause",
+        action="store_true",
+        help="Do not wait for input on error (useful for CI).",
+    )
     args = parser.parse_args()
 
-    if importlib.util.find_spec("argostranslate") is None:
-        print("Missing dependency: argostranslate. Attempting to install...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "argostranslate"])
+    try:
+        if importlib.util.find_spec("argostranslate") is None:
+            print("Missing dependency: argostranslate. Attempting to install...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "argostranslate"])
 
-    import argostranslate.package
-    import argostranslate.translate
+        import argostranslate.package
+        import argostranslate.translate
 
-    process(
-        Path(args.en),
-        Path(args.ru),
-        args.from_code,
-        args.to_code,
-        argostranslate.package,
-        argostranslate.translate,
-    )
+        process(
+            Path(args.en),
+            Path(args.ru),
+            args.from_code,
+            args.to_code,
+            argostranslate.package,
+            argostranslate.translate,
+        )
+        print("Translation completed successfully.")
+        return 0
+    except Exception as exc:
+        print(f"Translation failed: {exc}")
+        if sys.platform.startswith("win") and not args.no_pause:
+            input("Press Enter to close...")
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
