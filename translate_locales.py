@@ -1,10 +1,9 @@
 import argparse
+import importlib.util
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-
-import argostranslate.package
-import argostranslate.translate
 
 PLACEHOLDER_PATTERN = re.compile(
     r"(\{[^{}]+\}|\$\{[^{}]+\}|%[sd]|%\d+\$[sd]|\\n|\\t|\\\\|\n\\)$"
@@ -53,9 +52,9 @@ def unmask_placeholders(text: str, replacements: list[str]) -> str:
     return TOKEN_PATTERN.sub(replacer, text)
 
 
-def translate_value(value: str, from_lang: str, to_lang: str) -> str:
+def translate_value(value: str, from_lang: str, to_lang: str, argos_translate) -> str:
     masked, replacements = mask_placeholders(value)
-    translated = argostranslate.translate.translate(masked, from_lang, to_lang)
+    translated = argos_translate.translate(masked, from_lang, to_lang)
     return unmask_placeholders(translated, replacements)
 
 
@@ -68,8 +67,8 @@ def load_key_map(path: Path) -> dict[str, str]:
     return key_map
 
 
-def ensure_language_installed(from_code: str, to_code: str) -> None:
-    packages = argostranslate.package.get_installed_packages()
+def ensure_language_installed(from_code: str, to_code: str, argos_package) -> None:
+    packages = argos_package.get_installed_packages()
     for package in packages:
         if package.from_code == from_code and package.to_code == to_code:
             return
@@ -79,8 +78,15 @@ def ensure_language_installed(from_code: str, to_code: str) -> None:
     )
 
 
-def process(en_path: Path, ru_path: Path, from_code: str, to_code: str) -> None:
-    ensure_language_installed(from_code, to_code)
+def process(
+    en_path: Path,
+    ru_path: Path,
+    from_code: str,
+    to_code: str,
+    argos_package,
+    argos_translate,
+) -> None:
+    ensure_language_installed(from_code, to_code, argos_package)
     ru_values = load_key_map(ru_path) if ru_path.exists() else {}
 
     output_lines: list[str] = []
@@ -92,7 +98,7 @@ def process(en_path: Path, ru_path: Path, from_code: str, to_code: str) -> None:
         en_value = parsed.value or ""
         current_value = ru_values.get(parsed.key, "")
         if not current_value or current_value.strip() == en_value.strip():
-            translated = translate_value(en_value, from_code, to_code)
+            translated = translate_value(en_value, from_code, to_code, argos_translate)
         else:
             translated = current_value
         output_line = f"{parsed.left}{parsed.right_prefix}{translated}"
@@ -113,7 +119,26 @@ def main() -> None:
     parser.add_argument("--to-code", default="ru")
     args = parser.parse_args()
 
-    process(Path(args.en), Path(args.ru), args.from_code, args.to_code)
+    if importlib.util.find_spec("argostranslate") is None:
+        print(
+            "Missing dependency: argostranslate. Install with:\n"
+            "  python -m pip install argostranslate\n"
+            "Then install the English->Russian package with:\n"
+            "  argos-translate-cli --install-package <path-to-en_ru-argosmodel>"
+        )
+        sys.exit(1)
+
+    import argostranslate.package
+    import argostranslate.translate
+
+    process(
+        Path(args.en),
+        Path(args.ru),
+        args.from_code,
+        args.to_code,
+        argostranslate.package,
+        argostranslate.translate,
+    )
 
 
 if __name__ == "__main__":
