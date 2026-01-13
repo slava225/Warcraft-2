@@ -1,6 +1,7 @@
 import argparse
 import importlib.util
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -72,8 +73,15 @@ def ensure_language_installed(from_code: str, to_code: str, argos_package) -> No
     for package in packages:
         if package.from_code == from_code and package.to_code == to_code:
             return
+    argos_package.update_index()
+    available = argos_package.get_available_packages()
+    for package in available:
+        if package.from_code == from_code and package.to_code == to_code:
+            argos_package.install_from_path(package.download())
+            return
     raise RuntimeError(
-        "Argos Translate language pack missing. Install with: "
+        "Argos Translate language pack missing and could not be downloaded. "
+        "Download en_ru from https://www.argosopentech.com/argospm/ and install with: "
         "argos-translate-cli --install-package <path-to-en_ru-argosmodel>"
     )
 
@@ -120,13 +128,8 @@ def main() -> None:
     args = parser.parse_args()
 
     if importlib.util.find_spec("argostranslate") is None:
-        print(
-            "Missing dependency: argostranslate. Install with:\n"
-            "  python -m pip install argostranslate\n"
-            "Then install the English->Russian package with:\n"
-            "  argos-translate-cli --install-package <path-to-en_ru-argosmodel>"
-        )
-        sys.exit(1)
+        print("Missing dependency: argostranslate. Attempting to install...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "argostranslate"])
 
     import argostranslate.package
     import argostranslate.translate
