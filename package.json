@@ -1,28 +1,27 @@
 {
-  "name": "city-chaos-gta2-style",
+  "name": "warm-search-visual-novel",
   "version": "1.0.0",
-  "description": "A GTA 2 style top-down action game built with Phaser 3",
+  "description": "Личная визуальная новелла о бережном знакомстве для мобильных экранов",
   "main": "index.html",
   "scripts": {
     "start": "python3 -m http.server 8000 || python -m SimpleHTTPServer 8000",
     "serve": "npx http-server -p 8000"
   },
   "keywords": [
-    "game",
-    "phaser3",
-    "gta2",
+    "visual-novel",
+    "story",
     "html5",
     "javascript",
     "mobile",
-    "action"
+    "interactive"
   ],
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/city-chaos-game.git"
+    "url": "https://github.com/yourusername/warm-search-visual-novel.git"
   },
-  "homepage": "https://yourusername.github.io/city-chaos-game",
+  "homepage": "https://yourusername.github.io/warm-search-visual-novel",
   "devDependencies": {
     "http-server": "^14.1.1"
   }
