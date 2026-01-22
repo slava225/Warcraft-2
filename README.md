@@ -30,11 +30,11 @@ http://localhost:8000
 
 ## GitHub Pages
 
-Этот репозиторий использует GitHub Actions для публикации страницы. Убедись, что в **Settings → Pages** выбран источник **GitHub Actions**. После каждого пуша в `main` сайт будет обновляться.
+Этот репозиторий использует GitHub Actions для публикации страницы. Убедись, что в **Settings → Pages** выбран источник **GitHub Actions**. Публикация запускается при пуше в ветку `codex/create-visual-novel-dating-game-7rx40p`.
 
 Если на странице всё ещё отображается старая версия, проверь:
 - в **Pages** выбран источник **GitHub Actions**;
-- публикация идёт из ветки `main` с текущими файлами.
+- публикация идёт из ветки `codex/create-visual-novel-dating-game-7rx40p` с текущими файлами.
 
 Адрес сайта: https://slava225.github.io/Warcraft-2/
 
