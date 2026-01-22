@@ -2,191 +2,437 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>City Chaos - GTA 2 Style Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0d1a">
+    <title>Тихие встречи — визуальная новелла</title>
     <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0d0d1a;
+            --bg-soft: #141428;
+            --accent: #ff7aa2;
+            --accent-2: #7ad7ff;
+            --text: #f5f2ff;
+            --muted: #b8b3d9;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-strong: rgba(255, 255, 255, 0.16);
+            --success: #93f7c0;
+            --danger: #ff9aa2;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            background: #000;
-            overflow: hidden;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+            background: radial-gradient(circle at top, #1a1233, #080810 60%);
+            color: var(--text);
+            overflow-x: hidden;
         }
-        
-        #game-container {
+
+        .app {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        header {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            width: 100vw;
-            height: 100vh;
+            padding: 20px clamp(16px, 4vw, 40px);
+        }
+
+        .title {
+            font-size: clamp(20px, 4vw, 32px);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .subtitle {
+            font-size: clamp(12px, 2.4vw, 14px);
+            color: var(--muted);
+        }
+
+        .status-panel {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--glass);
+            font-size: 12px;
+            color: var(--muted);
+            border: 1px solid transparent;
+        }
+
+        .pill strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+            gap: clamp(16px, 3vw, 32px);
+            padding: 0 clamp(16px, 4vw, 40px) 24px;
+        }
+
+        .scene {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: clamp(16px, 3vw, 28px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
             position: relative;
+            overflow: hidden;
         }
-        
-        #game-canvas {
-            display: block;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-        }
-        
-        #mobile-controls {
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            display: none;
-            z-index: 1000;
-            pointer-events: none;
-        }
-        
-        .control-button {
+
+        .scene::before,
+        .scene::after {
+            content: "";
             position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            color: white;
-            pointer-events: auto;
-            touch-action: none;
-            user-select: none;
+            filter: blur(60px);
+            opacity: 0.4;
+            z-index: 0;
         }
-        
-        .control-button:active {
-            background: rgba(255, 255, 255, 0.5);
+
+        .scene::before {
+            background: var(--accent);
+            top: -80px;
+            right: -60px;
         }
-        
-        #joystick-container {
-            position: absolute;
-            left: 30px;
-            bottom: 30px;
-            width: 150px;
-            height: 150px;
-            pointer-events: auto;
+
+        .scene::after {
+            background: var(--accent-2);
+            bottom: -80px;
+            left: -60px;
         }
-        
-        #joystick-base {
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 3px solid rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-        }
-        
-        #joystick-stick {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            left: 45px;
-            top: 45px;
-            transition: none;
-        }
-        
-        #action-buttons {
-            position: absolute;
-            right: 30px;
-            bottom: 30px;
-            pointer-events: auto;
-        }
-        
-        #enter-car-btn {
-            bottom: 70px;
-            right: 30px;
-        }
-        
-        #shoot-btn {
-            bottom: 0;
-            right: 100px;
-        }
-        
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a1a1a;
+
+        .scene-content {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            color: white;
-            font-family: 'Courier New', monospace;
+            gap: 20px;
         }
-        
-        #loading-text {
-            font-size: 24px;
-            margin-bottom: 20px;
+
+        .scene-label {
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 0.2em;
+            font-size: 10px;
+            color: var(--muted);
         }
-        
-        #loading-bar {
-            width: 300px;
-            height: 20px;
-            background: #333;
-            border: 2px solid #666;
+
+        .scene-title {
+            font-size: clamp(20px, 4vw, 32px);
+            font-weight: 700;
         }
-        
-        #loading-progress {
+
+        .dialogue {
+            font-size: clamp(16px, 3vw, 20px);
+            line-height: 1.6;
+            min-height: 120px;
+            white-space: pre-line;
+        }
+
+        .choices {
+            display: grid;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-size: 15px;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.2s ease, border 0.2s ease, background 0.2s ease;
+        }
+
+        .choice-btn:hover,
+        .choice-btn:focus {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel {
+            background: rgba(14, 12, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .panel h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--muted);
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .stat-bar {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .stat-bar span {
+            display: block;
             height: 100%;
-            background: linear-gradient(90deg, #ff0000, #ffff00);
-            width: 0%;
-            transition: width 0.3s;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
         }
-        
-        @media (max-width: 768px) {
-            #mobile-controls {
-                display: block;
+
+        .inventory {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px clamp(16px, 4vw, 40px) 26px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ghost-btn {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .ghost-btn:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .typewriter {
+            border-right: 2px solid rgba(255, 255, 255, 0.6);
+            animation: caret 0.8s step-end infinite;
+        }
+
+        @keyframes caret {
+            50% {
+                border-color: transparent;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 8, 16, 0.82);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 20;
+        }
+
+        .overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            max-width: 520px;
+            width: 100%;
+            background: #141428;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal input {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .modal button {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent);
+            color: #150b1f;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 960px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .status-panel {
+                justify-content: flex-start;
+            }
+
+            .dialogue {
+                min-height: 160px;
+            }
+
+            .choice-btn {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-    <div id="loading-screen">
-        <div id="loading-text">Loading City Chaos...</div>
-        <div id="loading-bar">
-            <div id="loading-progress"></div>
+    <div class="app">
+        <header>
+            <div>
+                <div class="title">Тихие встречи</div>
+                <div class="subtitle">Интерактивная новелла о мягком поиске близости</div>
+            </div>
+            <div class="status-panel">
+                <div class="pill">Глава: <strong id="chapter">Пролог</strong></div>
+                <div class="pill">Настроение: <strong id="mood">Теплое</strong></div>
+                <div class="pill">Время: <strong id="time">Вечер</strong></div>
+            </div>
+        </header>
+
+        <main>
+            <section class="scene">
+                <div class="scene-content">
+                    <div class="scene-label" id="scene-label">Сцена</div>
+                    <div class="scene-title" id="scene-title">Добро пожаловать</div>
+                    <div class="dialogue" id="dialogue"></div>
+                    <div class="choices" id="choices"></div>
+                </div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="panel">
+                    <h3>Профиль</h3>
+                    <div class="stat">
+                        <span>Имя героя</span>
+                        <strong id="player-name">—</strong>
+                    </div>
+                    <div class="stat">
+                        <span>Уверенность</span>
+                        <strong id="confidence">50</strong>
+                    </div>
+                    <div class="stat-bar"><span id="confidence-bar" style="width:50%"></span></div>
+                    <div class="stat">
+                        <span>Искренность</span>
+                        <strong id="sincerity">50</strong>
+                    </div>
+                    <div class="stat-bar"><span id="sincerity-bar" style="width:50%"></span></div>
+                    <div class="stat">
+                        <span>Симпатия</span>
+                        <strong id="affection">50</strong>
+                    </div>
+                    <div class="stat-bar"><span id="affection-bar" style="width:50%"></span></div>
+                </div>
+
+                <div class="panel">
+                    <h3>Заметки</h3>
+                    <div class="inventory" id="notes"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>Подсказка</h3>
+                    <p id="hint" style="font-size: 13px; line-height: 1.5; color: var(--muted);"></p>
+                </div>
+            </aside>
+        </main>
+
+        <footer>
+            <div>Выбирай ответы и наблюдай за тем, как меняется история.</div>
+            <div class="footer-actions">
+                <button class="ghost-btn" id="save-btn">Сохранить</button>
+                <button class="ghost-btn" id="restart-btn">Начать заново</button>
+            </div>
+        </footer>
+    </div>
+
+    <div class="overlay" id="intro-overlay">
+        <div class="modal">
+            <h2>Перед началом</h2>
+            <p>Это камерная история без фотографий и видео. Ты создаешь атмосферу словами и выбором. Как зовут героя?</p>
+            <input type="text" id="name-input" maxlength="20" placeholder="Например, Артём">
+            <button id="start-btn">Начать историю</button>
         </div>
     </div>
-    
-    <div id="game-container">
-        <canvas id="game-canvas"></canvas>
-        
-        <div id="mobile-controls">
-            <div id="joystick-container">
-                <div id="joystick-base"></div>
-                <div id="joystick-stick"></div>
-            </div>
-            
-            <div id="action-buttons">
-                <div class="control-button" id="enter-car-btn">🚗</div>
-                <div class="control-button" id="shoot-btn">🔫</div>
-            </div>
-        </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
     <script type="module" src="js/game.js"></script>
 </body>
 </html>
