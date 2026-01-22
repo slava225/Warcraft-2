@@ -30,13 +30,13 @@ http://localhost:8000
 
 ## GitHub Pages
 
-1. Открой репозиторий на GitHub и перейди в **Settings → Pages**.
-2. В разделе **Build and deployment** выбери:
-   - **Source:** Deploy from a branch
-   - **Branch:** `main` и папку `/ (root)`
-3. Сохрани настройки и дождись публикации.
+Этот репозиторий использует GitHub Actions для публикации страницы. Убедись, что в **Settings → Pages** выбран источник **GitHub Actions**. После каждого пуша в `main` сайт будет обновляться.
 
-После публикации сайт будет доступен по адресу: https://slava225.github.io/Warcraft-2/
+Если на странице всё ещё отображается старая версия, проверь:
+- в **Pages** выбран источник **GitHub Actions**;
+- публикация идёт из ветки `main` с текущими файлами.
+
+Адрес сайта: https://slava225.github.io/Warcraft-2/
 
 ## Лицензия
 
