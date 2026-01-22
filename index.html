@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0d0d1a">
-    <title>Тихие встречи — визуальная новелла</title>
+    <title>Тёплый поиск — визуальная новелла</title>
     <style>
         :root {
             color-scheme: dark;
@@ -168,6 +168,7 @@
             cursor: pointer;
             text-align: left;
             transition: transform 0.2s ease, border 0.2s ease, background 0.2s ease;
+            touch-action: manipulation;
         }
 
         .choice-btn:hover,
@@ -264,6 +265,7 @@
             border-radius: 12px;
             font-size: 13px;
             cursor: pointer;
+            touch-action: manipulation;
         }
 
         .ghost-btn:hover {
@@ -346,11 +348,18 @@
             }
 
             .dialogue {
-                min-height: 160px;
+                min-height: 200px;
+                font-size: 16px;
             }
 
             .choice-btn {
                 font-size: 14px;
+                padding: 16px;
+            }
+
+            footer {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
     </style>
@@ -359,8 +368,8 @@
     <div class="app">
         <header>
             <div>
-                <div class="title">Тихие встречи</div>
-                <div class="subtitle">Интерактивная новелла о мягком поиске близости</div>
+                <div class="title">Тёплый поиск</div>
+                <div class="subtitle">Личная визуальная новелла о бережном поиске девушки</div>
             </div>
             <div class="status-panel">
                 <div class="pill">Глава: <strong id="chapter">Пролог</strong></div>
@@ -387,7 +396,7 @@
                         <strong id="player-name">—</strong>
                     </div>
                     <div class="stat">
-                        <span>Уверенность</span>
+                        <span>Открытость</span>
                         <strong id="confidence">50</strong>
                     </div>
                     <div class="stat-bar"><span id="confidence-bar" style="width:50%"></span></div>
@@ -397,7 +406,7 @@
                     </div>
                     <div class="stat-bar"><span id="sincerity-bar" style="width:50%"></span></div>
                     <div class="stat">
-                        <span>Симпатия</span>
+                        <span>Взаимность</span>
                         <strong id="affection">50</strong>
                     </div>
                     <div class="stat-bar"><span id="affection-bar" style="width:50%"></span></div>
@@ -416,7 +425,7 @@
         </main>
 
         <footer>
-            <div>Выбирай ответы и наблюдай за тем, как меняется история.</div>
+            <div>Выбирай ответы и наблюдай за тем, как меняется настроение знакомства.</div>
             <div class="footer-actions">
                 <button class="ghost-btn" id="save-btn">Сохранить</button>
                 <button class="ghost-btn" id="restart-btn">Начать заново</button>
@@ -427,7 +436,7 @@
     <div class="overlay" id="intro-overlay">
         <div class="modal">
             <h2>Перед началом</h2>
-            <p>Это камерная история без фотографий и видео. Ты создаешь атмосферу словами и выбором. Как зовут героя?</p>
+            <p>Это камерная история без фотографий и видео. Ты создаёшь атмосферу словами и выбором. Как зовут героя?</p>
             <input type="text" id="name-input" maxlength="20" placeholder="Например, Артём">
             <button id="start-btn">Начать историю</button>
         </div>
